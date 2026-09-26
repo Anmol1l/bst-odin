@@ -50,15 +50,15 @@ const Tree = (() => {
         if (root.value === value) return true;
         if (root.value > value) {
             root = root.left;
-            if (includes(value)) return true;
+            if (includes(root, value)) return true;
         } else if (root.value < value) {
             root = root.right;
-            if (includes(value)) return true;
+            if (includes(root, value)) return true;
         }
         return false;
     };
 
-    function insert(root, key) {
+    const insert = (root, key) => {
         if (root === null) return new Node(key);
         if (key === root.value) return root;
 
@@ -68,11 +68,31 @@ const Tree = (() => {
         return root;
     }
 
-    return { includes, root, insert };
+    const getSuccessor = (curr) => {
+        curr = curr.right;
+        while (curr !== null && curr.left !== null) curr = curr.left;
+        return curr;
+    }
+
+    const delNode = (root, x) => {
+        if (root === null) return root;
+
+        if (root.value > x) root.left = delNode(root.left, x);
+        else if (root.value < x) root.right = delNode(root.right, x);
+        else {
+            if (root.left === null) return root.right;
+            if (root.right === null) return root.left;
+
+            const succ = getSuccessor(root);
+            root.value = succ.value;
+            root.right = delNode(root.right, succ.value);
+        }
+        return root;
+    }
+
+    return { includes, root, insert, delNode };
 })();
 
-console.log(Tree.insert(Tree.root, 63));
-console.log(Tree.insert(Tree.root, 2));
-console.log(Tree.includes(Tree.root, 2));
-prettyPrint(Tree.root);
+console.log(Tree.delNode(Tree.root, 3));
 
+prettyPrint(Tree.root);
