@@ -130,24 +130,87 @@ const Tree = (() => {
         callback(currNode.value);
     };
 
+    const find = (root, value) => {
+        if (root === null) return undefined;
+        if (root.value === value) return root;
+        if (root.value > value) {
+            root = root.left;
+            return find(root, value);
+        } else if (root.value < value) {
+            root = root.right;
+            return find(root, value);
+        }
+    };
+
+    const isLeaf = (node) => {
+        if (node.left === null && node.right === null) return true;
+        else return false;
+    };
+
+    const findLeftHeight = (currNode) => {
+        let left = 0;
+        let leftPtr = currNode;
+        while (!isLeaf(leftPtr)) {
+            leftPtr = leftPtr.left;
+            left++;
+            if (leftPtr.left === null && !isLeaf(leftPtr)) {
+                leftPtr = leftPtr.right;
+                left++;
+            }
+        }
+        return left;
+    };
+
+    const findRightHeight = (currNode) => {
+        let right = 0;
+        let rightPtr = currNode;
+        while (!isLeaf(rightPtr)) {
+            rightPtr = rightPtr.right;
+            right++;
+            if (rightPtr.right === null && !isLeaf(rightPtr)) {
+                rightPtr = rightPtr.left;
+                right++;
+            }
+        }
+        return right;
+    };
+
+    const height = (root, value) => {
+        let currNode = find(root, value);
+        if (currNode) {
+            if (isLeaf(currNode)) return 0;
+            else {
+                let left = 0;
+                if (currNode.left !== null) {
+                    left = findLeftHeight(currNode);
+                }
+
+                let right = 0;
+                if (currNode.right !== null) {
+                    right = findRightHeight(currNode);
+                }
+                return Math.max(left, right);
+
+            }
+        } else return undefined;
+    };
+
     return {
         includes,
         root,
+        find,
         insert,
         deleteItem,
         levelOrderForEach,
         preOrderForEach,
         inOrderForEach,
-        postOrderForEach
+        postOrderForEach,
+        height,
     };
 })();
 
 prettyPrint(Tree.root);
-
-// Tree.levelOrderForEach(Tree.root, printTree);
-// Tree.preOrderForEach(Tree.root, printTree);
-// Tree.inOrderForEach(Tree.root, printTree);
-Tree.postOrderForEach(Tree.root, printTree);
+console.log(Tree.height(Tree.root, 1));
 
 function printTree(value) {
     console.log(value);
