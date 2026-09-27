@@ -190,15 +190,37 @@ const Tree = (() => {
                     right = findRightHeight(currNode);
                 }
                 return Math.max(left, right);
-
             }
         } else return undefined;
+    };
+
+    const depth = (currNode, value) => {
+        if (currNode.value === value) return 0;
+        let depth = 0;
+        while (currNode.value !== value) {
+            if (currNode.value > value) {
+                currNode = currNode.left;
+                depth++;
+                if (currNode === null) {
+                    return undefined;
+                }
+                continue;
+            }
+            if (currNode.value < value) {
+                currNode = currNode.right;
+                depth++;
+                if (currNode === null) {
+                    return undefined;
+                }
+                continue;
+            }
+        }
+        return depth;
     };
 
     return {
         includes,
         root,
-        find,
         insert,
         deleteItem,
         levelOrderForEach,
@@ -206,11 +228,13 @@ const Tree = (() => {
         inOrderForEach,
         postOrderForEach,
         height,
+        depth,
     };
 })();
 
 prettyPrint(Tree.root);
-console.log(Tree.height(Tree.root, 1));
+console.log(Tree.height(Tree.root, 67));
+console.log(Tree.depth(Tree.root, 6345));
 
 function printTree(value) {
     console.log(value);
