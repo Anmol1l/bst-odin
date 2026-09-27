@@ -43,7 +43,6 @@ const Tree = (() => {
     let array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
     array = sortArray(array);
     let root = buildtree(sortArray(array), 0, array.length - 1);
-    // prettyPrint(root);
 
     const includes = (root, value) => {
         if (root === null) return false;
@@ -66,33 +65,90 @@ const Tree = (() => {
         else root.right = insert(root.right, key);
 
         return root;
-    }
+    };
 
     const getSuccessor = (curr) => {
         curr = curr.right;
         while (curr !== null && curr.left !== null) curr = curr.left;
         return curr;
-    }
+    };
 
-    const delNode = (root, x) => {
+    const deleteItem = (root, x) => {
         if (root === null) return root;
 
-        if (root.value > x) root.left = delNode(root.left, x);
-        else if (root.value < x) root.right = delNode(root.right, x);
+        if (root.value > x) root.left = deleteItem(root.left, x);
+        else if (root.value < x) root.right = deleteItem(root.right, x);
         else {
             if (root.left === null) return root.right;
             if (root.right === null) return root.left;
 
             const succ = getSuccessor(root);
             root.value = succ.value;
-            root.right = delNode(root.right, succ.value);
+            root.right = deleteItem(root.right, succ.value);
         }
         return root;
-    }
+    };
 
-    return { includes, root, insert, delNode };
+    const levelOrderForEach = (currNode, callback) => {
+        if (!callback) throw new Error("No callback provided");
+        if (currNode == null) return;
+        let queue = [];
+        queue.push(currNode);
+        while (queue.length !== 0) {
+            currNode = queue[0];
+            callback(currNode.value);
+            if (currNode.left !== null) queue.push(currNode.left);
+            if (currNode.right != null) queue.push(currNode.right);
+            queue.shift();
+        }
+    };
+
+    const preOrderForEach = (currNode, callback) => {
+        if (!callback) throw new Error("No callback provided");
+        if (currNode == null) return;
+
+        callback(currNode.value);
+        preOrderForEach(currNode.left, callback);
+        preOrderForEach(currNode.right, callback);
+    };
+
+    const inOrderForEach = (currNode, callback) => {
+        if (!callback) throw new Error("No callback provided");
+        if (currNode == null) return;
+
+        inOrderForEach(currNode.left, callback);
+        callback(currNode.value);
+        inOrderForEach(currNode.right, callback);
+    };
+
+    const postOrderForEach = (currNode, callback) => {
+        if (!callback) throw new Error("No callback provided");
+        if (currNode == null) return;
+
+        postOrderForEach(currNode.left, callback);
+        postOrderForEach(currNode.right, callback);
+        callback(currNode.value);
+    };
+
+    return {
+        includes,
+        root,
+        insert,
+        deleteItem,
+        levelOrderForEach,
+        preOrderForEach,
+        inOrderForEach,
+        postOrderForEach
+    };
 })();
 
-console.log(Tree.delNode(Tree.root, 3));
-
 prettyPrint(Tree.root);
+
+// Tree.levelOrderForEach(Tree.root, printTree);
+// Tree.preOrderForEach(Tree.root, printTree);
+// Tree.inOrderForEach(Tree.root, printTree);
+Tree.postOrderForEach(Tree.root, printTree);
+
+function printTree(value) {
+    console.log(value);
+}
