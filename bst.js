@@ -12,7 +12,7 @@ class Node {
     }
 }
 
-const Tree = (() => {
+export const Tree = () => {
     const buildtreeWorking = (array, start, end) => {
         if (start > end) return null;
         let mid = Math.trunc((start + end) / 2);
@@ -27,6 +27,7 @@ const Tree = (() => {
     const buildtree = (array) => {
         array = sortArray(array);
         let root = buildtreeWorking(array, 0, array.length - 1);
+        prettyPrint(root);
         return root;
     };
 
@@ -105,8 +106,8 @@ const Tree = (() => {
         return values;
     };
 
-    const levelOrderForEach = (value) => {
-        return levelOrderForEachWorking(root, value);
+    const levelOrderForEach = (callback) => {
+        return levelOrderForEachWorking(root, callback);
     };
 
     const preOrderForEachWorking = (currNode, callback) => {
@@ -246,7 +247,7 @@ const Tree = (() => {
     };
 
     const depth = (value) => {
-        return depth(root,value)
+        return depthWorking(root,value)
     }
 
     const checkBalance = (node) => {
@@ -280,9 +281,8 @@ const Tree = (() => {
     };
 
     const rebalance = () => {
-        let values = levelOrderForEach(root, getValue);
+        let values = levelOrderForEach(getValue);
         root = buildtree(values);
-        prettyPrint(root);
     };
 
     return {
@@ -300,7 +300,7 @@ const Tree = (() => {
         isBalanced,
         rebalance,
     };
-})();
+};
 
 function printTree(value) {
     console.log(value);
@@ -310,7 +310,7 @@ function getValue(value) {
     return value;
 }
 
-const prettyPrint = (node, prefix = "", isLeft = true) => {
+function prettyPrint(node, prefix = "", isLeft = true){
     if (node === null || node === undefined) {
         return;
     }
