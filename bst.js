@@ -143,6 +143,7 @@ const Tree = (() => {
     };
 
     const isLeaf = (node) => {
+        if(node === null) return true
         if (node.left === null && node.right === null) return true;
         else return false;
     };
@@ -153,7 +154,7 @@ const Tree = (() => {
         while (!isLeaf(leftPtr)) {
             leftPtr = leftPtr.left;
             left++;
-            if (leftPtr.left === null && !isLeaf(leftPtr)) {
+            if (leftPtr !== null && !isLeaf(leftPtr) && leftPtr.left === null) {
                 leftPtr = leftPtr.right;
                 left++;
             }
@@ -167,7 +168,7 @@ const Tree = (() => {
         while (!isLeaf(rightPtr)) {
             rightPtr = rightPtr.right;
             right++;
-            if (rightPtr.right === null && !isLeaf(rightPtr)) {
+            if (rightPtr !== null && !isLeaf(rightPtr) && right.right === null) {
                 rightPtr = rightPtr.left;
                 right++;
             }
@@ -218,6 +219,38 @@ const Tree = (() => {
         return depth;
     };
 
+    const checkBalance = (node) => {
+        let left = findLeftHeight(node);
+        let right = findRightHeight(node);
+        let diff = Math.abs(left - right);
+        if (diff <= 1)
+            return true
+        else return false;
+    }
+
+    const levelOrderForEachNode = (currNode, callback) => {
+        let callbackReturn = [];
+        if (!callback) throw new Error("No callback provided");
+        if (currNode == null) return;
+        let queue = [];
+        queue.push(currNode);
+        while (queue.length !== 0) {
+            currNode = queue[0];
+            callbackReturn.push(callback(currNode));
+            if (currNode.left !== null) queue.push(currNode.left);
+            if (currNode.right != null) queue.push(currNode.right);
+            queue.shift();
+        }
+        return callbackReturn;
+    };
+
+    const isBalanced = () => {
+        let array = levelOrderForEachNode(root,checkBalance);
+        if(array.includes(false))
+            return false
+        else return true;
+    }
+
     return {
         includes,
         root,
@@ -229,12 +262,19 @@ const Tree = (() => {
         postOrderForEach,
         height,
         depth,
+        checkBalance,
+        isBalanced,
     };
 })();
 
-prettyPrint(Tree.root);
-console.log(Tree.height(Tree.root, 67));
+// prettyPrint(Tree.root);
 console.log(Tree.depth(Tree.root, 6345));
+Tree.insert(Tree.root,2)
+Tree.insert(Tree.root,10000)
+Tree.insert(Tree.root,20000000)
+console.log(Tree.height(Tree.root, 8));
+prettyPrint(Tree.root);
+console.log(Tree.isBalanced());
 
 function printTree(value) {
     console.log(value);
