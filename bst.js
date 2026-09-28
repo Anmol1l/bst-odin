@@ -31,7 +31,10 @@ export const Tree = () => {
         return root;
     };
 
-    let root = buildtree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
+        let array = getRandomArray(10,1,100);
+
+    // let root = buildtree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
+    let root = buildtree(array);
 
     const includesWorking = (root, value) => {
         if (root === null) return false;
@@ -326,7 +329,7 @@ function sortArray(array) {
     return array;
 }
 
-function getRandomArray(length, min, max) {
+export function getRandomArray(length, min, max) {
     return Array.from(
         { length },
         () => Math.floor(Math.random() * (max - min + 1)) + min,
