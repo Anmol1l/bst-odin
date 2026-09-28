@@ -8,6 +8,18 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
     prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
 };
 
+function sortArray(array) {
+    array = [...new Set(array)];
+    array.sort((a, b) => a - b);
+    return array;
+}
+
+function getRandomArray(length, min, max) {
+  return Array.from({ length }, () => 
+    Math.floor(Math.random() * (max - min + 1)) + min
+  );
+}
+
 class Node {
     constructor(root) {
         this.value = root;
@@ -23,26 +35,24 @@ class Node {
 }
 
 const Tree = (() => {
-    const buildtree = (array, start, end) => {
+    const buildtreeWorking = (array, start, end) => {
         if (start > end) return null;
         let mid = Math.trunc((start + end) / 2);
         let root = new Node(array[mid]);
 
-        root.setLeft(buildtree(array, start, mid - 1));
-        root.setRight(buildtree(array, mid + 1, end));
+        root.setLeft(buildtreeWorking(array, start, mid - 1));
+        root.setRight(buildtreeWorking(array, mid + 1, end));
 
         return root;
     };
 
-    const sortArray = (array) => {
-        array = [...new Set(array)];
-        array.sort((a, b) => a - b);
-        return array;
+    const buildtree = (array) => {
+        array = sortArray(array);
+        let root = buildtreeWorking(array, 0, array.length - 1);
+        return root;
     };
 
-    let array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
-    array = sortArray(array);
-    let root = buildtree(sortArray(array), 0, array.length - 1);
+    let root = buildtree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
 
     const includes = (root, value) => {
         if (root === null) return false;
@@ -90,17 +100,19 @@ const Tree = (() => {
     };
 
     const levelOrderForEach = (currNode, callback) => {
+        let values = []
         if (!callback) throw new Error("No callback provided");
         if (currNode == null) return;
         let queue = [];
         queue.push(currNode);
         while (queue.length !== 0) {
             currNode = queue[0];
-            callback(currNode.value);
+            values.push(callback(currNode.value));
             if (currNode.left !== null) queue.push(currNode.left);
             if (currNode.right != null) queue.push(currNode.right);
             queue.shift();
         }
+        return values;
     };
 
     const preOrderForEach = (currNode, callback) => {
@@ -143,7 +155,7 @@ const Tree = (() => {
     };
 
     const isLeaf = (node) => {
-        if(node === null) return true
+        if (node === null) return true;
         if (node.left === null && node.right === null) return true;
         else return false;
     };
@@ -168,7 +180,11 @@ const Tree = (() => {
         while (!isLeaf(rightPtr)) {
             rightPtr = rightPtr.right;
             right++;
-            if (rightPtr !== null && !isLeaf(rightPtr) && right.right === null) {
+            if (
+                rightPtr !== null &&
+                !isLeaf(rightPtr) &&
+                right.right === null
+            ) {
                 rightPtr = rightPtr.left;
                 right++;
             }
@@ -223,10 +239,9 @@ const Tree = (() => {
         let left = findLeftHeight(node);
         let right = findRightHeight(node);
         let diff = Math.abs(left - right);
-        if (diff <= 1)
-            return true
+        if (diff <= 1) return true;
         else return false;
-    }
+    };
 
     const levelOrderForEachNode = (currNode, callback) => {
         let callbackReturn = [];
@@ -245,10 +260,15 @@ const Tree = (() => {
     };
 
     const isBalanced = () => {
-        let array = levelOrderForEachNode(root,checkBalance);
-        if(array.includes(false))
-            return false
+        let array = levelOrderForEachNode(root, checkBalance);
+        if (array.includes(false)) return false;
         else return true;
+    };
+
+    const rebalance = () => {
+        let values = [];
+        values.push(levelOrderForEach(root,getValue))
+        return values;
     }
 
     return {
@@ -264,18 +284,25 @@ const Tree = (() => {
         depth,
         checkBalance,
         isBalanced,
+        rebalance,
     };
 })();
 
 // prettyPrint(Tree.root);
-console.log(Tree.depth(Tree.root, 6345));
-Tree.insert(Tree.root,2)
-Tree.insert(Tree.root,10000)
-Tree.insert(Tree.root,20000000)
-console.log(Tree.height(Tree.root, 8));
+// console.log(Tree.depth(Tree.root, 6345));
+// Tree.insert(Tree.root,2)
+// Tree.insert(Tree.root,10000)
+// Tree.insert(Tree.root,20000000)
+// console.log(Tree.height(Tree.root, 8));
 prettyPrint(Tree.root);
 console.log(Tree.isBalanced());
+// console.log(Tree.levelOrderForEach(Tree.root,getValue));
+console.log(Tree.rebalance());
 
 function printTree(value) {
     console.log(value);
+}
+
+function getValue (value) {
+    return value;
 }
