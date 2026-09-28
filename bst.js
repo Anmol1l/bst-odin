@@ -1,25 +1,3 @@
-const prettyPrint = (node, prefix = "", isLeft = true) => {
-    if (node === null || node === undefined) {
-        return;
-    }
-
-    prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
-    console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.value}`);
-    prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
-};
-
-function sortArray(array) {
-    array = [...new Set(array)];
-    array.sort((a, b) => a - b);
-    return array;
-}
-
-function getRandomArray(length, min, max) {
-  return Array.from({ length }, () => 
-    Math.floor(Math.random() * (max - min + 1)) + min
-  );
-}
-
 class Node {
     constructor(root) {
         this.value = root;
@@ -52,29 +30,37 @@ const Tree = (() => {
         return root;
     };
 
-    let root = buildtree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
+    let root = buildtree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
 
-    const includes = (root, value) => {
+    const includesWorking = (root, value) => {
         if (root === null) return false;
         if (root.value === value) return true;
         if (root.value > value) {
             root = root.left;
-            if (includes(root, value)) return true;
+            if (includesWorking(root, value)) return true;
         } else if (root.value < value) {
             root = root.right;
-            if (includes(root, value)) return true;
+            if (includesWorking(root, value)) return true;
         }
         return false;
     };
 
-    const insert = (root, key) => {
+    const includes = (value) => {
+        return includesWorking(root, value);
+    };
+
+    const insertWorking = (root, key) => {
         if (root === null) return new Node(key);
         if (key === root.value) return root;
 
-        if (key < root.value) root.left = insert(root.left, key);
-        else root.right = insert(root.right, key);
+        if (key < root.value) root.left = insertWorking(root.left, key);
+        else root.right = insertWorking(root.right, key);
 
         return root;
+    };
+
+    const insert = (value) => {
+        return insertWorking(root, value);
     };
 
     const getSuccessor = (curr) => {
@@ -83,24 +69,28 @@ const Tree = (() => {
         return curr;
     };
 
-    const deleteItem = (root, x) => {
+    const deleteItemWorking = (root, x) => {
         if (root === null) return root;
 
-        if (root.value > x) root.left = deleteItem(root.left, x);
-        else if (root.value < x) root.right = deleteItem(root.right, x);
+        if (root.value > x) root.left = deleteItemWorking(root.left, x);
+        else if (root.value < x) root.right = deleteItemWorking(root.right, x);
         else {
             if (root.left === null) return root.right;
             if (root.right === null) return root.left;
 
             const succ = getSuccessor(root);
             root.value = succ.value;
-            root.right = deleteItem(root.right, succ.value);
+            root.right = deleteItemWorking(root.right, succ.value);
         }
         return root;
     };
 
-    const levelOrderForEach = (currNode, callback) => {
-        let values = []
+    const deleteItem = (value) => {
+        return deleteItemWorking(root, value);
+    };
+
+    const levelOrderForEachWorking = (currNode, callback) => {
+        let values = [];
         if (!callback) throw new Error("No callback provided");
         if (currNode == null) return;
         let queue = [];
@@ -115,32 +105,48 @@ const Tree = (() => {
         return values;
     };
 
-    const preOrderForEach = (currNode, callback) => {
+    const levelOrderForEach = (value) => {
+        return levelOrderForEachWorking(root, value);
+    };
+
+    const preOrderForEachWorking = (currNode, callback) => {
         if (!callback) throw new Error("No callback provided");
         if (currNode == null) return;
 
         callback(currNode.value);
-        preOrderForEach(currNode.left, callback);
-        preOrderForEach(currNode.right, callback);
+        preOrderForEachWorking(currNode.left, callback);
+        preOrderForEachWorking(currNode.right, callback);
     };
 
-    const inOrderForEach = (currNode, callback) => {
+    const preOrderForEach = (value) => {
+        return preOrderForEachWorking(root, value);
+    };
+
+    const inOrderForEachWorking = (currNode, callback) => {
         if (!callback) throw new Error("No callback provided");
         if (currNode == null) return;
 
-        inOrderForEach(currNode.left, callback);
+        inOrderForEachWorking(currNode.left, callback);
         callback(currNode.value);
-        inOrderForEach(currNode.right, callback);
+        inOrderForEachWorking(currNode.right, callback);
     };
 
-    const postOrderForEach = (currNode, callback) => {
+    const inOrderForEach = (callback => {
+        return inOrderForEachWorking(root, callback);
+    })
+
+    const postOrderForEachWorking = (currNode, callback) => {
         if (!callback) throw new Error("No callback provided");
         if (currNode == null) return;
 
-        postOrderForEach(currNode.left, callback);
-        postOrderForEach(currNode.right, callback);
+        postOrderForEachWorking(currNode.left, callback);
+        postOrderForEachWorking(currNode.right, callback);
         callback(currNode.value);
     };
+
+    const postOrderForEach = (callback) => {
+        return postOrderForEachWorking(root,callback);
+    }
 
     const find = (root, value) => {
         if (root === null) return undefined;
@@ -192,7 +198,7 @@ const Tree = (() => {
         return right;
     };
 
-    const height = (root, value) => {
+    const heightWorking = (root, value) => {
         let currNode = find(root, value);
         if (currNode) {
             if (isLeaf(currNode)) return 0;
@@ -211,7 +217,11 @@ const Tree = (() => {
         } else return undefined;
     };
 
-    const depth = (currNode, value) => {
+    const height = (value) => {
+        return heightWorking(root,value);
+    }
+
+    const depthWorking = (currNode, value) => {
         if (currNode.value === value) return 0;
         let depth = 0;
         while (currNode.value !== value) {
@@ -234,6 +244,10 @@ const Tree = (() => {
         }
         return depth;
     };
+
+    const depth = (value) => {
+        return depth(root,value)
+    }
 
     const checkBalance = (node) => {
         let left = findLeftHeight(node);
@@ -266,10 +280,10 @@ const Tree = (() => {
     };
 
     const rebalance = () => {
-        let values = levelOrderForEach(root,getValue)
+        let values = levelOrderForEach(root, getValue);
         root = buildtree(values);
-        prettyPrint(root)
-    }
+        prettyPrint(root);
+    };
 
     return {
         includes,
@@ -288,23 +302,35 @@ const Tree = (() => {
     };
 })();
 
-// prettyPrint(Tree.root);
-console.log(Tree.depth(Tree.root, 6345));
-Tree.insert(Tree.root,2)
-Tree.insert(Tree.root,10000)
-Tree.insert(Tree.root,20000000)
-console.log(Tree.height(Tree.root, 8));
-prettyPrint(Tree.root);
-console.log(Tree.isBalanced());
-// console.log(Tree.levelOrderForEach(Tree.root,getValue));
-
-
 function printTree(value) {
     console.log(value);
 }
 
-function getValue (value) {
+function getValue(value) {
     return value;
+}
+
+const prettyPrint = (node, prefix = "", isLeft = true) => {
+    if (node === null || node === undefined) {
+        return;
+    }
+
+    prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
+    console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.value}`);
+    prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
+};
+
+function sortArray(array) {
+    array = [...new Set(array)];
+    array.sort((a, b) => a - b);
+    return array;
+}
+
+function getRandomArray(length, min, max) {
+    return Array.from(
+        { length },
+        () => Math.floor(Math.random() * (max - min + 1)) + min,
+    );
 }
 
 window.Tree = Tree;
