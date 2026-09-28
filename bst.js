@@ -266,9 +266,9 @@ const Tree = (() => {
     };
 
     const rebalance = () => {
-        let values = [];
-        values.push(levelOrderForEach(root,getValue))
-        return values;
+        let values = levelOrderForEach(root,getValue)
+        root = buildtree(values);
+        prettyPrint(root)
     }
 
     return {
@@ -289,15 +289,15 @@ const Tree = (() => {
 })();
 
 // prettyPrint(Tree.root);
-// console.log(Tree.depth(Tree.root, 6345));
-// Tree.insert(Tree.root,2)
-// Tree.insert(Tree.root,10000)
-// Tree.insert(Tree.root,20000000)
-// console.log(Tree.height(Tree.root, 8));
+console.log(Tree.depth(Tree.root, 6345));
+Tree.insert(Tree.root,2)
+Tree.insert(Tree.root,10000)
+Tree.insert(Tree.root,20000000)
+console.log(Tree.height(Tree.root, 8));
 prettyPrint(Tree.root);
 console.log(Tree.isBalanced());
 // console.log(Tree.levelOrderForEach(Tree.root,getValue));
-console.log(Tree.rebalance());
+
 
 function printTree(value) {
     console.log(value);
@@ -306,3 +306,5 @@ function printTree(value) {
 function getValue (value) {
     return value;
 }
+
+window.Tree = Tree;
